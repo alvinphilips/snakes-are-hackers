@@ -1,0 +1,19 @@
+{
+  "name": "snakes-are-hackers-server",
+  "version": "1.0.0",
+  "description": "Server component of Snakes are Hackers, built on socket.io",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alvin Philips",
+  "license": "MIT",
+  "dependencies": {
+    "socket.io": "^4.5.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+}
