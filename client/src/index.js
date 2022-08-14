@@ -7,7 +7,7 @@ const socket = io('http://localhost:3000');
 // The Rendering resolution
 const WIDTH = 1280;
 const HEIGHT = 720;
-const HEX_GRID_RADIUS = 3;
+const HEX_GRID_RADIUS = 5;
 const SQRT_3 = Math.sqrt(3);
 
 // Div that our canvas will be added to
@@ -79,7 +79,7 @@ join_button.addEventListener('click', (e) => {
 // The PIXIjs Application
 const app = new PIXI.Application({ width: WIDTH, height: HEIGHT, antialias: true });
 
-const size = 50;
+const size = 30;
 
 // Add the Canvas to the DOM
 game_div.appendChild(app.view);
@@ -112,7 +112,7 @@ for (let q = -HEX_GRID_RADIUS; q <= HEX_GRID_RADIUS; q++) {
             hex.interactive = true
 
             hex.on('pointerover', (_event) => {
-                hex.tint = 0x00ddaa;
+                hex.tint = 0xdadfdc;
             })
 
             hex.on('pointerout', (_event) => {

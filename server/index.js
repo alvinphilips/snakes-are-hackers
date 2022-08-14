@@ -3,7 +3,7 @@ import { Server } from "socket.io";
 const ROOM_NAME_REGEX = /^[A-Z]{3,5}$/;
 const MAX_PLAYERS = 6;
 
-const HEX_GRID_RADIUS = 3;
+const HEX_GRID_RADIUS = 5;
 
 const COLORS = [0xF43F5E, 0xD946EF, 0x3B82F6, 0xEAB308, 0x71717A, 0x8B5CF6];
 
