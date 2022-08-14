@@ -43,6 +43,7 @@ class Game {
 const games = new Map();
 
 io.on('connection', (socket) => {
+    console.log(`Socket ${socket.id} connected`);
     // Join a Room
     socket.on('join-room', (room_id, callback) => {
         // Check if the ROOM ID matches our RegEx
@@ -81,7 +82,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Join a Room
+    // Place a tile
     socket.on('place-tile', (q, r, callback) => {
         if (-HEX_GRID_RADIUS <= q && q <= HEX_GRID_RADIUS
             && -HEX_GRID_RADIUS <= r && r <= HEX_GRID_RADIUS) {
