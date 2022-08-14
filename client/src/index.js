@@ -9,16 +9,62 @@ const HEIGHT = 720;
 const HEX_GRID_RADIUS = 3;
 const SQRT_3 = Math.sqrt(3);
 
-const app = new PIXI.Application({ width: WIDTH, height: HEIGHT, antialias: true });
-
+// Div that our canvas will be added to
 const game_div = document.getElementById('game');
+
+// Input field that contains the room ID
+const top_bar = document.getElementById('top_bar');
+const room_id = document.getElementById('room_id');
+const join_button = document.getElementById('join_room');
+
+// Update the top bar colors and alert if unsuccessful
+const update_top_bar = (success, message) =>{
+    // Remove neutral color classes
+    top_bar.classList.remove("bg-slate-600");
+    room_id.classList.remove("text-slate-900");
+    join_button.classList.remove("bg-slate-900");
+
+    if (success) {
+        // Remove old styles, if present
+        top_bar.classList.remove("bg-amber-600");
+        room_id.classList.remove("text-amber-900");
+        join_button.classList.remove("bg-amber-900");
+
+        // Update styles
+        top_bar.classList.add("bg-emerald-600");
+        room_id.classList.add("text-emerald-900");
+        join_button.classList.add("bg-emerald-900");
+    } else {
+        // Remove old styles, if present
+        top_bar.classList.remove("bg-emerald-600");
+        room_id.classList.remove("text-emerald-900");
+        join_button.classList.remove("bg-emerald-900");
+
+        // Update styles
+        top_bar.classList.add("bg-amber-600");
+        room_id.classList.add("text-amber-900");
+        join_button.classList.add("bg-amber-900");
+
+        if (message) {
+            alert(message);
+        }
+    }
+}
+
+join_button.addEventListener('click', (e) => {
+    e.preventDefault();
+    socket.emit('join-room', room_id.value.toUpperCase(), update_top_bar);
+});
+
+const app = new PIXI.Application({ width: WIDTH, height: HEIGHT, antialias: true });
 
 const size = 50;
 
 game_div.appendChild(app.view);
 
-game_div.firstElementChild.classList.add("w-full");
+game_div.lastElementChild.classList.add("w-full");
 
+// Grid for our game
 const hex_grid = new Map();
 
 const getXYfromCubeCoords = (q, r) => {
@@ -54,9 +100,7 @@ for (let q = -HEX_GRID_RADIUS; q <= HEX_GRID_RADIUS; q++) {
             })
 
             hex.on('pointerdown', (_event) => {
-                socket.emit('place-tile', q, r, color, message => {
-                    console.log(message);
-                });
+                socket.emit('place-tile', q, r, color, update_top_bar);
             })
 
             // Add hex tile to hex_grid Map
