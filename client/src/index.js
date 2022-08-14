@@ -4,6 +4,7 @@ import '@pixi/graphics-extras';
 
 const socket = io('http://localhost:3000');
 
+// The Rendering resolution
 const WIDTH = 1280;
 const HEIGHT = 720;
 const HEX_GRID_RADIUS = 3;
@@ -16,6 +17,9 @@ const game_div = document.getElementById('game');
 const top_bar = document.getElementById('top_bar');
 const room_id = document.getElementById('room_id');
 const join_button = document.getElementById('join_room');
+
+// Grid for our game
+const hex_grid = new Map();
 
 // Update the top bar colors and alert if unsuccessful
 const update_top_bar = (success, message) =>{
@@ -51,22 +55,40 @@ const update_top_bar = (success, message) =>{
     }
 }
 
+// Allow a player to join a room
 join_button.addEventListener('click', (e) => {
     e.preventDefault();
-    socket.emit('join-room', room_id.value.toUpperCase(), update_top_bar);
+    socket.emit('join-room', room_id.value.toUpperCase(), (success, message) => {
+        update_top_bar(success, message);
+
+        if (!success) {
+            return;
+        }
+        const game_colors = new Map(message);
+        for (let [key, value] of hex_grid) {
+            hex_grid.get(key).tint = 0xffffff;
+            hex_grid.get(key).interactive = true;
+            if (game_colors.has(key)) {
+                value.tint = game_colors.get(key);
+                value.interactive = false;
+            }
+        }
+    });
 });
 
+// The PIXIjs Application
 const app = new PIXI.Application({ width: WIDTH, height: HEIGHT, antialias: true });
 
 const size = 50;
 
+// Add the Canvas to the DOM
 game_div.appendChild(app.view);
 
+// Apply TailwindCSS styles to the canvas
 game_div.lastElementChild.classList.add("w-full");
 
-// Grid for our game
-const hex_grid = new Map();
-
+// Function to get cartesian coordinates from a hexagonal coordinate
+// See https://www.redblobgames.com/grids/hexagons/#coordinates for more info
 const getXYfromCubeCoords = (q, r) => {
     let x = size * (SQRT_3 * q + SQRT_3/2 * r);
     let y = size * (1.5 * r);
@@ -79,8 +101,6 @@ socket.on('set-tile', (q, r, color) => {
     hex.interactive = false;
 })
 
-const color = [0xff0000, 0x00ff00, 0x0000ff][Math.floor(Math.random() * 3)];
-
 for (let q = -HEX_GRID_RADIUS; q <= HEX_GRID_RADIUS; q++) {
     for (let r = -HEX_GRID_RADIUS; r <= HEX_GRID_RADIUS; r++) {
         let k = -q -r;
@@ -92,7 +112,7 @@ for (let q = -HEX_GRID_RADIUS; q <= HEX_GRID_RADIUS; q++) {
             hex.interactive = true
 
             hex.on('pointerover', (_event) => {
-                hex.tint = color / 2;
+                hex.tint = 0x00ddaa;
             })
 
             hex.on('pointerout', (_event) => {
@@ -100,12 +120,13 @@ for (let q = -HEX_GRID_RADIUS; q <= HEX_GRID_RADIUS; q++) {
             })
 
             hex.on('pointerdown', (_event) => {
-                socket.emit('place-tile', q, r, color, update_top_bar);
+                socket.emit('place-tile', q, r, update_top_bar);
             })
 
             // Add hex tile to hex_grid Map
             hex_grid.set(`${q};${r}`, hex);
 
+            // Add hex tile to the PIXI Application
             app.stage.addChild(hex)
         }
     }
